@@ -1,0 +1,8 @@
+{
+  "name": "folktuk",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ]
+}
