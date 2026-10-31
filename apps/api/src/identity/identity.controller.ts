@@ -1,9 +1,13 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { IdentityService } from './identity.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('identity')
 export class IdentityController {
   constructor(private readonly identityService: IdentityService) {}
 
-  // Endpoints will be added in the next step
+  @Post('users')
+  async createUser(@Body() dto: CreateUserDto) {
+    return this.identityService.createUser(dto);
+  }
 }
