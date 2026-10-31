@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { IdentityModule } from './identity/identity.module';
 
 @Module({
-  imports: [PrismaModule, IdentityModule],
+  imports: [
+    ConfigModule.forRoot(),
+    PrismaModule,
+    IdentityModule,
+  ],
   controllers: [],
   providers: [],
 })
