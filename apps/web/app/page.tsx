@@ -1,5 +1,23 @@
+'use client';
+
+import { useState } from 'react';
 import { PostFeed } from '../components/post-feed';
+import { CommunitySidebar, DashboardSidebar } from '../components/dashboard-sidebar';
 
 export default function Home() {
-  return <div className="grid gap-10 lg:grid-cols-[1fr_320px]"><section><p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-coral">The global gathering place</p><h1 className="mb-8 text-5xl font-black tracking-tight">What&apos;s happening<br /><span className="text-moss">in your FolkTuk?</span></h1><PostFeed /></section><aside className="card h-fit bg-ink text-white"><p className="text-sm font-bold uppercase tracking-widest text-coral">FolkTuk values</p><h2 className="mt-4 text-2xl font-bold">Folks, gather here.</h2><p className="mt-3 leading-7 text-white/70">A calmer corner of the internet for connection, communities, and opportunities.</p><a className="mt-6 inline-block font-semibold text-white underline" href="/communities">Explore communities →</a></aside></div>;
+  const [topic, setTopic] = useState('');
+  return (
+    <div className="grid gap-6 md:grid-cols-[190px_minmax(0,1fr)] lg:grid-cols-[190px_minmax(0,1fr)_260px]">
+      <DashboardSidebar />
+      <section className="min-w-0">
+        <div className="mb-6">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-coral">The global gathering place</p>
+          <h1 className="mt-2 text-4xl font-black tracking-tight">What&apos;s happening <span className="text-moss">in your FolkTuk?</span></h1>
+        </div>
+        {topic && <button className="mb-4 text-sm font-semibold text-moss" onClick={() => setTopic('')}>Filtering by {topic} · Clear filter</button>}
+        <PostFeed topic={topic} />
+      </section>
+      <CommunitySidebar onTopicSelect={setTopic} />
+    </div>
+  );
 }

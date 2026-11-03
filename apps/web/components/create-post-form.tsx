@@ -3,8 +3,9 @@
 import { FormEvent, useState } from 'react';
 import { post } from '../lib/api';
 import { useAuth } from './auth-context';
+import type { Post } from '../lib/types';
 
-export function CreatePostForm({ onCreated }: { onCreated: () => void }) {
+export function CreatePostForm({ onCreated }: { onCreated: (post: Post) => void }) {
   const { token } = useAuth();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -16,10 +17,10 @@ export function CreatePostForm({ onCreated }: { onCreated: () => void }) {
     event.preventDefault();
     setError('');
     try {
-      await post('/posts', { title, content, published: true });
+      const created = await post<Post>('/posts', { title, content, published: true });
       setTitle('');
       setContent('');
-      onCreated();
+      onCreated(created);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create post');
     }

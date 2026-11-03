@@ -10,6 +10,7 @@ type AuthContextValue = {
   login: (identifier: string, password: string) => Promise<void>;
   register: (input: Record<string, string>) => Promise<void>;
   logout: () => void;
+  updateUser: (user: User) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -45,7 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
-  return <AuthContext.Provider value={{ user, token, login, register, logout }}>{children}</AuthContext.Provider>;
+  const updateUser = (updatedUser: User) => setUser(updatedUser);
+
+  return <AuthContext.Provider value={{ user, token, login, register, logout, updateUser }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

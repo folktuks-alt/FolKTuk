@@ -1,0 +1,12 @@
+{
+  "preset": "ts-jest/presets/default-esm",
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testRegex": ".*\\.spec\\.ts$",
+  "testPathIgnorePatterns": ["/test/"],
+  "extensionsToTreatAsEsm": [".ts"],
+  "globals": { "ts-jest": { "useESM": true, "tsconfig": "test/tsconfig.json", "diagnostics": false } },
+  "collectCoverageFrom": ["src/**/*.ts"],
+  "coverageDirectory": "./coverage",
+  "testEnvironment": "node"
+}

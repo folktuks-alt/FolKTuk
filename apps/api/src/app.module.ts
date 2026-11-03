@@ -7,6 +7,8 @@ import { CommentsModule } from './comments/comments.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { CommunitiesModule } from './communities/communities.module';
 import { UsersModule } from './users/users.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { UsersModule } from './users/users.module';
     ReactionsModule,
     CommunitiesModule,
     UsersModule,
+    NotificationsModule,
+    SearchModule,
   ],
   controllers: [],
   providers: [],

@@ -12,4 +12,8 @@ export class CreateCommunityDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  topics?: string[];
 }

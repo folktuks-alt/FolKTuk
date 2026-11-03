@@ -24,6 +24,17 @@ enum CommunityMemberRole {
   MEMBER
 }
 
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+}
+
 model User {
   id                String         @id @default(cuid())
   email             String         @unique
@@ -38,9 +49,14 @@ model User {
   posts             Post[]
   comments          Comment[]
   postLikes         PostLike[]
+  postReactions     PostReaction[]
   commentLikes      CommentLike[]
   communitiesCreated Community[]       @relation("CommunityCreator")
   communityMemberships CommunityMember[]
+  receivedNotifications Notification[] @relation("NotificationRecipient")
+  sentNotifications     Notification[] @relation("NotificationActor")
+  followers             Follow[] @relation("UserFollowers")
+  following             Follow[] @relation("UserFollowing")
 }
 
 model Profile {
@@ -50,11 +66,26 @@ model Profile {
   displayName       String
   bio               String?
   avatarUrl         String?
+  bannerUrl         String?
   visibility        ProfileVisibility @default(PUBLIC)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@index([followerId])
 }
 
 model Post {
@@ -71,8 +102,10 @@ model Post {
   community Community? @relation("CommunityPosts", fields: [communityId], references: [id], onDelete: SetNull)
   comments  Comment[]
   likes     PostLike[]
+  reactions PostReaction[]
 
   @@index([published, createdAt])
+  @@index([createdAt])
   @@index([authorId])
   @@index([communityId])
 }
@@ -106,6 +139,20 @@ model PostLike {
   @@index([postId])
 }
 
+model PostReaction {
+  id        String       @id @default(cuid())
+  userId    String
+  postId    String
+  type      ReactionType
+  createdAt DateTime     @default(now())
+
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId, type])
+  @@index([postId])
+}
+
 model CommentLike {
   id        String   @id @default(cuid())
   userId    String
@@ -119,11 +166,33 @@ model CommentLike {
   @@index([commentId])
 }
 
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  actorId     String
+  type        NotificationType
+  targetId    String
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  recipient User @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor     User @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, read, createdAt])
+  @@index([recipientId, createdAt])
+  @@index([read])
+  @@index([targetId])
+}
+
 model Community {
   id          String            @id @default(cuid())
   name        String            @unique
   slug        String            @unique
   description String?
+  topics      String[]          @default([])
+  rules       String[]          @default([])
+  bannerUrl   String?
+  avatarUrl   String?
   creatorId   String
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt

@@ -34,6 +34,11 @@ export class PostsController {
     return this.postsService.findPublished(query);
   }
 
+  @Get('trending')
+  trending() {
+    return this.postsService.trending();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(id);

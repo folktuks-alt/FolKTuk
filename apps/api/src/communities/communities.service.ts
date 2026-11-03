@@ -30,6 +30,7 @@ export class CommunitiesService {
           name: dto.name,
           slug: dto.slug,
           description: dto.description,
+          topics: dto.topics ?? [],
           creatorId,
         },
       });
@@ -52,9 +53,18 @@ export class CommunitiesService {
     });
   }
 
-  async findBySlug(slug: string, query: CommunityPostQueryDto) {
-    const community = await this.prisma.community.findUnique({
-      where: { slug },
+  findJoined(userId: string) {
+    return this.prisma.communityMember.findMany({
+      where: { userId },
+      include: { community: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findByIdentifier(identifier: string, query: CommunityPostQueryDto) {
+    const community = await this.prisma.community.findFirst({
+      where: { OR: [{ id: identifier }, { slug: identifier }] },
+      include: { _count: { select: { members: true } } },
     });
 
     if (!community) {
@@ -78,6 +88,7 @@ export class CommunitiesService {
 
     return {
       ...community,
+      memberCount: community._count.members,
       posts: {
         data,
         total,

@@ -34,12 +34,18 @@ export class CommunitiesController {
     return this.communitiesService.findAll();
   }
 
-  @Get(':slug')
-  findBySlug(
-    @Param('slug') slug: string,
+  @Get('joined')
+  @UseGuards(JwtAuthGuard)
+  findJoined(@Req() request: AuthenticatedRequest) {
+    return this.communitiesService.findJoined(request.user.userId);
+  }
+
+  @Get(':id')
+  findById(
+    @Param('id') id: string,
     @Query() query: CommunityPostQueryDto,
   ) {
-    return this.communitiesService.findBySlug(slug, query);
+    return this.communitiesService.findByIdentifier(id, query);
   }
 
   @Post(':id/join')

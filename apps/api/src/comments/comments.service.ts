@@ -6,10 +6,16 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { PostsGateway } from '../posts/posts.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly postsGateway: PostsGateway,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async create(postId: string, authorId: string, dto: CreateCommentDto) {
     const post = await this.prisma.post.findUnique({ where: { id: postId } });
@@ -18,13 +24,24 @@ export class CommentsService {
       throw new NotFoundException('Post not found');
     }
 
-    return this.prisma.comment.create({
+    const comment = await this.prisma.comment.create({
       data: {
         content: dto.content,
         postId,
         authorId,
       },
     });
+    this.postsGateway.emitPostCommented(comment);
+    if (post.authorId !== authorId) {
+      const notification = await this.notificationsService.create(
+        post.authorId,
+        authorId,
+        'COMMENT',
+        postId,
+      );
+      this.postsGateway.emitNotification(post.authorId, notification);
+    }
+    return comment;
   }
 
   async findByPost(postId: string) {

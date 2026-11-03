@@ -6,5 +6,5 @@ import './globals.css';
 export const metadata: Metadata = { title: 'FolkTuk', description: 'Connect. Converse. Belong.' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><Providers><SiteHeader /><main className="mx-auto min-h-screen max-w-6xl px-5 py-10">{children}</main></Providers></body></html>;
+  return <html lang="en" suppressHydrationWarning><body suppressHydrationWarning><Providers><SiteHeader /><main className="mx-auto min-h-screen max-w-6xl px-5 py-10">{children}</main></Providers></body></html>;
 }

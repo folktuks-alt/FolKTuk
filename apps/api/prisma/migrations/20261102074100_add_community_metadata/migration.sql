@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Community"
+ADD COLUMN "topics" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "rules" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "bannerUrl" TEXT,
+ADD COLUMN "avatarUrl" TEXT;

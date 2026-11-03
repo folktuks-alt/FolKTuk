@@ -33,6 +33,16 @@ export class ReactionsController {
     return this.reactionsService.unlikePost(request.user.userId, postId);
   }
 
+  @Post('posts/:postId/dislike')
+  dislikePost(@Param('postId') postId: string, @Req() request: AuthenticatedRequest) {
+    return this.reactionsService.dislikePost(request.user.userId, postId);
+  }
+
+  @Delete('posts/:postId/dislike')
+  undislikePost(@Param('postId') postId: string, @Req() request: AuthenticatedRequest) {
+    return this.reactionsService.undislikePost(request.user.userId, postId);
+  }
+
   @Post('comments/:commentId/like')
   likeComment(
     @Param('commentId') commentId: string,

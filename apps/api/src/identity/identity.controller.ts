@@ -25,6 +25,11 @@ export class IdentityController {
     return this.identityService.createUser(dto);
   }
 
+  @Post('signup')
+  async signup(@Body() dto: CreateUserDto) {
+    return this.identityService.createUser(dto);
+  }
+
   @Post('login')
   async login(@Body() dto: LoginDto) {
     return this.identityService.login(dto);
