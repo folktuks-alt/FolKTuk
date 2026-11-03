@@ -19,6 +19,11 @@ enum ProfileVisibility {
   PRIVATE
 }
 
+enum CommunityMemberRole {
+  ADMIN
+  MEMBER
+}
+
 model User {
   id                String         @id @default(cuid())
   email             String         @unique
@@ -30,6 +35,12 @@ model User {
   deletedAt         DateTime?
 
   profile           Profile?
+  posts             Post[]
+  comments          Comment[]
+  postLikes         PostLike[]
+  commentLikes      CommentLike[]
+  communitiesCreated Community[]       @relation("CommunityCreator")
+  communityMemberships CommunityMember[]
 }
 
 model Profile {
@@ -44,4 +55,96 @@ model Profile {
   updatedAt         DateTime          @updatedAt
 
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  authorId  String
+  communityId String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  community Community? @relation("CommunityPosts", fields: [communityId], references: [id], onDelete: SetNull)
+  comments  Comment[]
+  likes     PostLike[]
+
+  @@index([published, createdAt])
+  @@index([authorId])
+  @@index([communityId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes     CommentLike[]
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@index([commentId])
+}
+
+model Community {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  slug        String            @unique
+  description String?
+  creatorId   String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  creator     User              @relation("CommunityCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  members     CommunityMember[]
+  posts       Post[]            @relation("CommunityPosts")
+
+  @@index([creatorId])
+}
+
+model CommunityMember {
+  id          String              @id @default(cuid())
+  userId      String
+  communityId String
+  role        CommunityMemberRole @default(MEMBER)
+  createdAt   DateTime            @default(now())
+
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community   Community           @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, communityId])
+  @@index([communityId])
 }
